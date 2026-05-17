@@ -16,7 +16,7 @@
 
         <!-- simplyCountdown -->
             <link rel="stylesheet" href="countdown/themes/default.css" />
-            <script src="countdown/simplyCountdown.js"></script>
+            <div class="my-super-countdown simply-countdown-circle"></div>
 
         <!-- Bootstrap Icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -338,19 +338,65 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bs5-lightbox@1.8.3/dist/index.bundle.min.js"></script>
 
-        <script>
-          simplyCountdown('.simply-countdown', {
-            year: 2026, // required
-            month: 12, // required
-            day: 27, // required
-            hours: 8, // Default is 0 [0-23] integer
-            words: { //words displayed into the countdown
-              days: { singular: 'hari', plural: 'hari' },
-              hours: { singular: 'jam', plural: 'jam' },
-              minutes: { singular: 'menit', plural: 'menit' },
-              seconds: { singular: 'detik', plural: 'detik' }
-            },
-          });
+        <script>// .my-super-countdown is an example
+// you can target any HTML element with any CSS selector
+simplyCountdown(".my-super-countdown", {
+    // Target date (Required)
+    year: 2025, // Target year [YYYY]
+    month: 12, // Target month [1-12]
+    day: 25, // Target day [1-31]
+    hours: 0, // Target hours [0-23]
+    minutes: 0, // Target minutes [0-59]
+    seconds: 0, // Target seconds [0-59]
+
+    // Words customization
+    words: {
+        days: {
+            // Function to handle pluralization
+            lambda: (root, count) => (count > 1 ? root + "s" : root),
+            root: "day", // Base word for days
+        },
+        hours: {
+            lambda: (root, count) => (count > 1 ? root + "s" : root),
+            root: "hour",
+        },
+        minutes: {
+            lambda: (root, count) => (count > 1 ? root + "s" : root),
+            root: "minute",
+        },
+        seconds: {
+            lambda: (root, count) => (count > 1 ? root + "s" : root),
+            root: "second",
+        },
+    },
+
+    // Display options
+    plural: true, // Enable/disable pluralization
+    inline: false, // Display inline (true) or in blocks (false)
+    inlineSeparator: ", ", // Separator for inline display
+    enableUtc: false, // Use UTC time instead of local time
+
+    // Styling classes
+    inlineClass: "simply-countdown-inline", // Class for inline display
+    sectionClass: "simply-section", // Class for each time unit section
+    amountClass: "simply-amount", // Class for number display
+    wordClass: "simply-word", // Class for word display
+
+    // Formatting options
+    zeroPad: false, // Add leading zeros to numbers (e.g., 05 instead of 5)
+    countUp: false, // Count up from target date instead of down to it
+    removeZeroUnits: false, // Hide time units when they reach zero
+    refresh: 1000, // Update interval in milliseconds (1 second = 1000)
+
+    // Event handlers
+    onEnd: () => {
+        // Callback function when countdown ends
+        console.log("Countdown finished!");
+    },
+    onStop: () => {}, // Callback when countdown is stopped
+    onResume: () => {}, // Callback when countdown is resumed
+    onUpdate: (params) => {}, // Callback when countdown is updated
+});
         </script>
 
         <script>
