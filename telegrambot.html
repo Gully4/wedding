@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Auto Bot</title>
+</head>
+<body>
+
+<h2>Telegram Auto Respon Bot</h2>
+<p>Bot sedang aktif...</p>
+
+<script>
+
+// =========================
+// ISI TOKEN BOT TELEGRAM
+// =========================
+const TOKEN = "8992003147:AAHDcE8mTItn5LKnuL4eY3_-aNJXpDzv4kQ";
+
+// =========================
+// FOTO & VIDEO AUTO RESPON
+// =========================
+const FOTO_URL = "https://picsum.photos/400";
+const VIDEO_URL = "https://samplelib.com/lib/preview/mp4/sample-5s.mp4";
+
+// =========================
+// KATA AUTO RESPON
+// =========================
+const responses = {
+  "halo": "Halo juga 👋",
+  "hai": "Hai juga 😄",
+  "p": "Hadir 👌",
+  "assalamualaikum": "Waalaikumsalam 😊",
+  "bot": "Ya saya aktif 🤖",
+  "menu": "Menu:\n- foto\n- video\n- semangat\n- random"
+};
+
+let lastUpdateId = 0;
+
+// =========================
+// KIRIM PESAN
+// =========================
+async function sendMessage(chatId, text) {
+  await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text
+    })
+  });
+}
+
+// =========================
+// KIRIM FOTO
+// =========================
+async function sendPhoto(chatId, caption = "Foto random 📸") {
+  await fetch(`https://api.telegram.org/bot${TOKEN}/sendPhoto`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      photo: FOTO_URL,
+      caption: caption
+    })
+  });
+}
+
+// =========================
+// KIRIM VIDEO
+// =========================
+async function sendVideo(chatId, caption = "Video random 🎬") {
+  await fetch(`https://api.telegram.org/bot${TOKEN}/sendVideo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      video: VIDEO_URL,
+      caption: caption
+    })
+  });
+}
+
+// =========================
+// AUTO RAMAIKAN GRUP
+// =========================
+const autoChat = [
+  "Semangat semuanya 🔥",
+  "Jangan lupa ngopi ☕",
+  "Bot aktif nih 🤖",
+  "Siapa yang online? 👀",
+  "Semoga harimu menyenangkan 😄",
+  "Gas terus grupnya 🚀"
+  "🔥 Grup jangan sepi dong",
+  "👀 Siapa yang masih online?",
+  "☕ Sudah ngopi belum semuanya?",
+  "😂 Ada cerita lucu hari ini?",
+  "🚀 Gas terus obrolannya",
+  "🤖 Bot siap meramaikan grup",
+  "😄 Jangan lupa bahagia hari ini",
+  "📸 Ada yang mau foto random?",
+  "🎬 Mau video random juga bisa",
+  "🎤 Ketik suara buat voice otomatis",
+  "😂 Ketik meme buat meme random",
+  "💪 Semangat semuanya",
+  "🎉 Grup paling aktif hari ini",
+  "🔥 Jangan cuma read aja",
+  "👋 Halo member baru",
+  "😎 Bot aktif 24 jam nonstop"
+];
+
+let lastGroupId = null;
+
+async function autoRame() {
+  if(lastGroupId) {
+    const randomText = autoChat[Math.floor(Math.random() * autoChat.length)];
+    sendMessage(lastGroupId, randomText);
+  }
+}
+
+// Kirim chat otomatis tiap 5 menit
+setInterval(autoRame, 300000);
+
+// =========================
+// CEK PESAN MASUK
+// =========================
+async function getUpdates() {
+
+  try {
+
+    const res = await fetch(
+      `https://api.telegram.org/bot${TOKEN}/getUpdates?offset=${lastUpdateId + 1}`
+    );
+
+    const data = await res.json();
+
+    if(data.result.length > 0) {
+
+      for(const update of data.result) {
+
+        lastUpdateId = update.update_id;
+
+        if(update.message) {
+
+          const chatId = update.message.chat.id;
+          const text = (update.message.text || "").toLowerCase();
+
+          // Simpan grup terakhir
+          if(update.message.chat.type.includes("group")) {
+            lastGroupId = chatId;
+          }
+
+          // =========================
+          // AUTO RESPON KATA
+          // =========================
+          for(const key in responses) {
+            if(text.includes(key)) {
+              sendMessage(chatId, responses[key]);
+            }
+          }
+
+          // =========================
+          // FOTO
+          // =========================
+          if(text.includes("foto")) {
+            sendPhoto(chatId);
+          }
+
+          // =========================
+          // VIDEO
+          // =========================
+          if(text.includes("video")) {
+            sendVideo(chatId);
+          }
+
+          // =========================
+          // RANDOM CHAT
+          // =========================
+          if(text.includes("random")) {
+            const randomText = autoChat[Math.floor(Math.random() * autoChat.length)];
+            sendMessage(chatId, randomText);
+          }
+
+          // =========================
+          // SEMANGAT
+          // =========================
+          if(text.includes("semangat")) {
+            sendMessage(chatId, "Tetap semangat dan jangan menyerah 💪🔥");
+          }
+
+        }
+      }
+    }
+
+  } catch(err) {
+    console.log("Error:", err);
+  }
+}
+
+// =========================
+// AUTO AKTIF
+// =========================
+setInterval(getUpdates, 3000);
+
+</script>
+
+</body>
+</html>
