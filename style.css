@@ -493,3 +493,11 @@ footer li {
     top: 31px;
   }
 }
+#list-ucapan .card{
+  background: white;
+}
+
+#list-ucapan h5,
+#list-ucapan p{
+  color: black !important;
+}
