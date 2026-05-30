@@ -1,0 +1,657 @@
+# Telegram Bot NodeJS Full Version
+
+Bot ini sudah support:
+
+* Auto respon grup
+* Auto respon chat pribadi
+* Auto welcome member
+* Auto kirim meme
+* Auto kirim foto/video
+* Auto reply stiker
+* Auto reply suara
+* Auto rame grup otomatis
+* Anti sepi grup
+* 24 jam online
+* Cocok untuk Render / Railway / VPS
+
+---
+
+# 1. Install NodeJS
+
+Download:
+
+urlNode.js Official Website[https://nodejs.org](https://nodejs.org)
+
+Cek versi:
+
+```bash
+node -v
+npm -v
+```
+
+---
+
+# 2. Buat Folder Project
+
+```bash
+mkdir telegram-bot
+cd telegram-bot
+```
+
+---
+
+# 3. Install Module
+
+```bash
+npm init -y
+npm install node-telegram-bot-api axios
+```
+
+---
+
+# 4. Buat File `index.js`
+
+Isi dengan kode berikut:
+
+```javascript
+const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
+
+// =========================
+// TOKEN BOT
+// =========================
+const token = '8992003147:AAHDcE8mTItn5LKnuL4eY3_-aNJXpDzv4kQ';
+
+// =========================
+// AKTIFKAN BOT
+// =========================
+const bot = new TelegramBot(token, {
+  polling: true
+});
+
+console.log('Bot aktif...');
+
+// =========================
+// DATA RANDOM
+// =========================
+const memes = [
+  'https://i.imgflip.com/30b1gx.jpg',
+  'https://i.imgflip.com/1bij.jpg',
+  'https://i.imgflip.com/26am.jpg',
+  'https://i.imgflip.com/2fm6x.jpg'
+];
+
+const photos = [
+  'https://picsum.photos/500',
+  'https://picsum.photos/600',
+  'https://picsum.photos/700'
+];
+
+const videos = [
+  'https://samplelib.com/lib/preview/mp4/sample-5s.mp4'
+];
+
+const autoChat = [
+  '🔥 Grup jangan sepi dong',
+  '👀 Siapa yang masih online?',
+  '☕ Sudah ngopi belum semuanya?',
+  '😂 Ada cerita lucu hari ini?',
+  '🚀 Gas terus obrolannya',
+  '🤖 Bot siap meramaikan grup',
+  '😄 Jangan lupa bahagia hari ini',
+  '📸 Ada yang mau foto random?',
+  '🎬 Mau video random juga bisa',
+  '🎤 Ketik suara buat voice otomatis',
+  '😂 Ketik meme buat meme random',
+  '💪 Semangat semuanya',
+  '🎉 Grup paling aktif hari ini',
+  '🔥 Jangan cuma read aja',
+  '😎 Bot aktif 24 jam nonstop'
+];
+
+let lastGroupId = null;
+
+// =========================
+// AUTO WELCOME MEMBER
+// =========================
+bot.on('new_chat_members', async (msg) => {
+
+  const chatId = msg.chat.id;
+
+  msg.new_chat_members.forEach(async (member) => {
+
+    await bot.sendMessage(
+      chatId,
+      `🎉 Selamat datang ${member.first_name}\nSemoga betah dan aktif ya 🔥`
+    );
+
+    await bot.sendPhoto(chatId, photos[0], {
+      caption: 'Welcome member baru 📸'
+    });
+
+  });
+});
+
+// =========================
+// AUTO RESPON CHAT
+// =========================
+bot.on('message', async (msg) => {
+
+  const chatId = msg.chat.id;
+  const text = (msg.text || '').toLowerCase();
+
+  // Simpan grup
+  if(msg.chat.type.includes('group')) {
+    lastGroupId = chatId;
+  }
+
+  // =========================
+  // RESPON DASAR
+  // =========================
+  if(text.includes('halo')) {
+    bot.sendMessage(chatId, 'Halo juga 👋');
+  }
+
+  if(text.includes('hai')) {
+    bot.sendMessage(chatId, 'Hai juga 😄');
+  }
+
+  if(text === 'p') {
+    bot.sendMessage(chatId, 'Hadir 👌');
+  }
+
+  if(text.includes('assalamualaikum')) {
+    bot.sendMessage(chatId, 'Waalaikumsalam 😊');
+  }
+
+  if(text.includes('semangat')) {
+    bot.sendMessage(chatId, 'Tetap semangat 💪🔥');
+  }
+
+  // =========================
+  // FOTO
+  // =========================
+  if(text.includes('foto')) {
+
+    const randomPhoto = photos[
+      Math.floor(Math.random() * photos.length)
+    ];
+
+    bot.sendPhoto(chatId, randomPhoto, {
+      caption: '📸 Foto random'
+    });
+  }
+
+  // =========================
+  // VIDEO
+  // =========================
+  if(text.includes('video')) {
+
+    const randomVideo = videos[
+      Math.floor(Math.random() * videos.length)
+    ];
+
+    bot.sendVideo(chatId, randomVideo, {
+      caption: '🎬 Video random'
+    });
+  }
+
+  // =========================
+  // MEME
+  // =========================
+  if(text.includes('meme') || text.includes('lucu')) {
+
+    const randomMeme = memes[
+      Math.floor(Math.random() * memes.length)
+    ];
+
+    bot.sendPhoto(chatId, randomMeme, {
+      caption: '😂 Meme random'
+    });
+  }
+
+  // =========================
+  // VOICE
+  // =========================
+  if(text.includes('voice') || text.includes('suara')) {
+
+    bot.sendVoice(
+      chatId,
+      'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    );
+  }
+
+  // =========================
+  // RANDOM CHAT
+  // =========================
+  if(text.includes('random')) {
+
+    const randomText = autoChat[
+      Math.floor(Math.random() * autoChat.length)
+    ];
+
+    bot.sendMessage(chatId, randomText);
+  }
+
+  // =========================
+  // STIKER
+  // =========================
+  if(msg.sticker) {
+    bot.sendMessage(chatId, '😂 Stikernya lucu banget');
+  }
+
+  // =========================
+  // FOTO USER
+  // =========================
+  if(msg.photo) {
+    bot.sendMessage(chatId, '📸 Fotonya keren 😄');
+  }
+
+  // =========================
+  // VIDEO USER
+  // =========================
+  if(msg.video) {
+    bot.sendMessage(chatId, '🎬 Videonya mantap 🔥');
+  }
+
+});
+
+// =========================
+// AUTO RAMAIKAN GRUP
+// =========================
+setInterval(async () => {
+
+  if(lastGroupId) {
+
+    const randomText = autoChat[
+      Math.floor(Math.random() * autoChat.length)
+    ];
+
+    await bot.sendMessage(lastGroupId, randomText);
+
+    // Random meme
+    if(Math.random() < 0.3) {
+
+      const randomMeme = memes[
+        Math.floor(Math.random() * memes.length)
+      ];
+
+      await bot.sendPhoto(lastGroupId, randomMeme, {
+        caption: '😂 Meme random'
+      });
+    }
+
+    // Random foto
+    if(Math.random() < 0.3) {
+
+      const randomPhoto = photos[
+        Math.floor(Math.random() * photos.length)
+      ];
+
+      await bot.sendPhoto(lastGroupId, randomPhoto, {
+        caption: '📸 Foto random'
+      });
+    }
+
+  }
+
+}, 120000);
+```
+
+---
+
+# 5. Jalankan Bot
+
+```bash
+node index.js
+```
+
+Kalau berhasil:
+
+```bash
+Bot aktif...
+```
+
+---
+
+# 6. Matikan Privacy Mode
+
+Buka Telegram → BotFather
+
+Ketik:
+
+```text
+/setprivacy
+```
+
+Pilih bot → Disable
+
+---
+
+# 7. Tambahkan Bot ke Grup
+
+* Masukkan bot ke grup
+* Jadikan admin
+* Kirim pesan di grup
+
+Bot langsung aktif.
+
+---
+
+# 8. Deploy 24 Jam Gratis
+
+Bisa upload ke:
+
+* urlRender[https://render.com](https://render.com)
+* urlRailway[https://railway.app](https://railway.app)
+* urlReplit[https://replit.com](https://replit.com)
+
+---
+
+# 9. Struktur File
+
+```text
+telegram-bot/
+ ├── index.js
+ ├── package.json
+ └── node_modules/
+```
+
+---
+
+# 10. Fitur Sangat Ramai Otomatis
+
+Tambahkan kode berikut DI BAWAH:
+
+```javascript
+let memberActivity = {};
+```
+
+---
+
+## AUTO TAG MEMBER RANDOM
+
+Tambahkan:
+
+```javascript
+// =========================
+// AUTO TAG MEMBER RANDOM
+// =========================
+async function tagRandomMember(chatId) {
+
+  try {
+
+    const teks = [
+      '👀 Lagi ngapain nih?',
+      '🔥 Mana suaranya?',
+      '☕ Jangan lupa ngopi',
+      '😂 Cerita lucu dong',
+      '🎉 Grup harus rame terus'
+    ];
+
+    const randomText = teks[
+      Math.floor(Math.random() * teks.length)
+    ];
+
+    await bot.sendMessage(chatId, randomText);
+
+  } catch(err) {
+    console.log(err);
+  }
+}
+```
+
+---
+
+## AUTO BALAS RANDOM SEMUA CHAT
+
+Tambahkan di dalam:
+
+```javascript
+bot.on('message', async (msg) => {
+```
+
+Tambahkan:
+
+```javascript
+// =========================
+// AUTO RANDOM REPLY
+// =========================
+const randomReplies = [
+  '😂 Wkwkwk',
+  '🔥 Mantap',
+  '😄 Seru juga',
+  '👀 Oke lanjut',
+  '🤖 Bot ikut nimbrung',
+  '🚀 Gas terus',
+  '☕ Santai dulu',
+  '🎉 Asik rame',
+  '😎 Auto hadir',
+  '💪 Semangat terus'
+];
+
+if(Math.random() < 0.25) {
+
+  const reply = randomReplies[
+    Math.floor(Math.random() * randomReplies.length)
+  ];
+
+  bot.sendMessage(chatId, reply, {
+    reply_to_message_id: msg.message_id
+  });
+}
+```
+
+---
+
+## AUTO MEMBER AKTIF
+
+Tambahkan di dalam:
+
+```javascript
+bot.on('message', async (msg) => {
+```
+
+Tambahkan:
+
+```javascript
+// =========================
+// TRACK MEMBER AKTIF
+// =========================
+const username = msg.from.first_name;
+
+if(!memberActivity[username]) {
+  memberActivity[username] = 0;
+}
+
+memberActivity[username]++;
+```
+
+---
+
+## AUTO TOP MEMBER
+
+Tambahkan:
+
+```javascript
+// =========================
+// TOP MEMBER AKTIF
+// =========================
+setInterval(async () => {
+
+  if(lastGroupId) {
+
+    const sorted = Object.entries(memberActivity)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0,3);
+
+    let text = '🏆 Member paling aktif hari ini:
+
+';
+
+    sorted.forEach((user, index) => {
+      text += `${index + 1}. ${user[0]} = ${user[1]} chat
+`;
+    });
+
+    await bot.sendMessage(lastGroupId, text);
+  }
+
+}, 600000);
+```
+
+---
+
+## AUTO GAME RANDOM
+
+Tambahkan:
+
+```javascript
+// =========================
+// GAME RANDOM
+// =========================
+const games = [
+  '🎯 Tebak angka 1-10',
+  '😂 Siapa paling lucu di grup?',
+  '👀 Siapa yang belum tidur?',
+  '🔥 Spam emoji favorit kalian',
+  '🎵 Lagu favorit hari ini apa?',
+  '📸 Kirim foto random kalian'
+];
+
+setInterval(async () => {
+
+  if(lastGroupId) {
+
+    const game = games[
+      Math.floor(Math.random() * games.length)
+    ];
+
+    await bot.sendMessage(lastGroupId, `🎮 GAME RANDOM
+
+${game}`);
+  }
+
+}, 420000);
+```
+
+---
+
+## AUTO SPAM RINGAN BIAR RAMAI
+
+Tambahkan:
+
+```javascript
+// =========================
+// AUTO SPAM RINGAN
+// =========================
+setInterval(async () => {
+
+  if(lastGroupId) {
+
+    const spam = [
+      '🔥',
+      '😂',
+      '👀',
+      '🚀',
+      '😎',
+      '☕',
+      '🎉'
+    ];
+
+    const randomSpam = spam[
+      Math.floor(Math.random() * spam.length)
+    ];
+
+    await bot.sendMessage(lastGroupId, randomSpam);
+  }
+
+}, 90000);
+```
+
+---
+
+## AUTO KOMENTAR FOTO & VIDEO
+
+Ganti bagian:
+
+```javascript
+if(msg.photo) {
+```
+
+Menjadi:
+
+```javascript
+if(msg.photo) {
+
+  const komentarFoto = [
+    '📸 Fotonya keren banget',
+    '😄 Cakep fotonya',
+    '🔥 Mantap nih',
+    '😂 Auto viral',
+    '👀 Nice shot'
+  ];
+
+  const randomKomentar = komentarFoto[
+    Math.floor(Math.random() * komentarFoto.length)
+  ];
+
+  bot.sendMessage(chatId, randomKomentar);
+```
+
+---
+
+## HASIL FITUR RAMAI
+
+Bot sekarang bisa:
+
+* Auto ngobrol terus
+* Auto reply random
+* Auto meme random
+* Auto spam ringan
+* Auto game grup
+* Auto ranking member aktif
+* Auto komentar foto/video
+* Auto tag random
+* Grup terasa hidup 24 jam
+* Sangat ramai otomatis
+
+---
+
+# 10. Fitur Yang Bisa Ditambah
+
+Bisa ditambah lagi:
+
+* AI ChatGPT
+* Anti link
+* Anti spam
+* Auto delete kata kasar
+* Downloader TikTok
+* Downloader Instagram
+* Auto sticker maker
+* Music player
+* Auto post grup
+* Level XP member
+* Ranking member aktif
+* Game Telegram
+* Auto reply AI manusia
+
+---
+
+# 11. Penting
+
+Ganti bagian ini:
+
+```javascript
+const token = 'ISI_TOKEN_BOT';
+```
+
+Menjadi token bot asli.
+
+Contoh:
+
+```javascript
+const token = '123456789:AAxxxxxx';
+```
+
+Jangan share token bot ke orang lain.
